@@ -4,7 +4,13 @@ A self-contained essay + runnable demos. The claim — that a matrix-free *dial*
 (the effective rank Φ₁) tells you which "quantum speedups" survive a classical
 attack — is not asserted, it is **run**.
 
-- **The article:** [`article.md`](article.md) (also [`article.tex`](article.tex)).
+Two articles, same question, different angles:
+
+- **The science** — [`article.md`](article.md) (also [`article.tex`](article.tex)):
+  the matrix-free dial, the demos, the line between dequantizable and genuine.
+- **The story** — [`the-1000-dollar-question.md`](the-1000-dollar-question.md):
+  the honest companion — *"I spent ~$1000 on AI tools to find out which quantum
+  advantages are real,"* less math, more confession.
 - **The demos** live in [`stands/`](stands/) and are reproducible in seconds.
 
 ## Run the demos
