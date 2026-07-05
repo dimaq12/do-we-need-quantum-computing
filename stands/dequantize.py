@@ -23,6 +23,12 @@ s ≪ n rows ∝ ‖row‖².  We grow n by 500× with s FIXED: accuracy stays �
 fraction of data touched vanishes.  Cost tracks the RANK, not the dimension —
 the signature of a dequantized algorithm.
 
+ACCESS MODEL (honest).  The ‖row‖² sampling distribution is assumed GIVEN — the
+same sample-access the quantum algorithm itself required (its QRAM); classically,
+Tang's data structure maintains it at update time.  "Data touched" below counts
+the sketched rows entering the SVD; this demo computes the row norms directly
+only because it has no data structure standing in.
+
 Run:  python3 examples/quantum/dequantize.py
 """
 import sys, os
@@ -70,6 +76,9 @@ if __name__ == "__main__":
     print(f"\n  Same s={s} as n grows 500× — accuracy ≈1, touching a vanishing fraction.")
     print(f"  The 'exponential quantum advantage' for low-rank collapses to classical")
     print(f"  sampling — it was REDUNDANT, paying for structure (low Φ₁) you sample free.")
+    print(f"  Access model: ‖row‖²-sampling is assumed given — the same access the")
+    print(f"  quantum algorithm required (QRAM); Tang's data structure provides it")
+    print(f"  classically.  'Data touched' counts the sketched rows entering the SVD.")
 
     # The DIAL itself, measured: Φ₁ = resona.effective_rank of AᵀA — matrix-free
     # (matvec Bᵀ(Uᵀ(U(B·v))), A=U·B is never formed) — confirms the low rank we exploit.
