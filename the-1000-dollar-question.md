@@ -1,6 +1,6 @@
 # I spent ~$1000 on AI tools to find out if we actually need quantum computers
 
-*The honest companion to the [technical piece](article.md). Same question, different angle — less math, more confession.*
+*The honest companion to the [technical piece](https://github.com/dimaq12/do-we-need-quantum-computing/blob/main/article.md). Same question, different angle — less math, more confession.*
 
 ## The confession
 
@@ -54,14 +54,16 @@ learning algorithm got matched by a classical one (a then-undergraduate did it i
 2018, and a whole family of "quantum advantages" quietly collapsed afterward), I
 wanted to know if there was a *measurable* way to tell the genuine speedups from
 the costumes. It turns out there is — a single matrix-free number, the effective
-rank, that reads *low → dequantizable* and *high → genuine frontier*. The
-[technical article](article.md) walks through it with code, and the demos in
-[`stands/`](stands/) print every number, checked against ground truth. You can run
+rank, that, across every case I tested, reads *low* for the dequantizable problems
+and *high* for the ones that resist (an empirical discriminator, not a proof). The
+[technical article](https://github.com/dimaq12/do-we-need-quantum-computing/blob/main/article.md) walks through it with code, and the demos in
+[`stands/`](https://github.com/dimaq12/do-we-need-quantum-computing/tree/main/stands) print every number, checked against ground truth. You can run
 them in about a minute.
 
 But the diagnostic was one read of one object, and the object kept opening doors.
-The dial that dequantizes low-rank machine learning is the same dial that says
-*Shor's factoring is a real wall, no shortcut.* The same machinery reads the
+The dial that dequantizes low-rank machine learning is the same dial that flags
+*Shor's factoring as resisting — no extractable handle, where every genuine quantum
+advantage we know of lives.* The same machinery reads the
 spectrum of a million-node graph, the curvature of a neural network's loss
 landscape, the eigenvalues of a non-symmetric operator scattered across the complex
 plane, a Gaussian process likelihood on data too big to store. So the
@@ -97,7 +99,7 @@ interesting sentence than *"I built a library over a weekend."* 😄
 ---
 
 **If you want the actual science** — the dial, the demos, the line between
-dequantizable and genuine — it's all in the [companion article](article.md), with
+dequantizable and genuine — it's all in the [companion article](https://github.com/dimaq12/do-we-need-quantum-computing/blob/main/article.md), with
 code you can run:
 
 ```bash

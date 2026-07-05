@@ -10,7 +10,8 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, urlcolor=blue, linkcolor=black}
 
-\title{\textbf{Do We Really Need Quantum Computing?}}
+\title{\textbf{Never Quantum at All}\\[6pt]
+ \large Do we really need quantum computing?}
 \author{Dmitry Sierikov}
 \date{}
 
@@ -26,7 +27,7 @@ and which were never quantum at all. Every number below is reproduced by a
 runnable demo in \texttt{stands/}, checked against ground truth.
 \end{abstract}
 
-\section*{The hook}
+\section*{The speedup that wasn't}
 
 In 2018 a then-undergraduate, Ewin Tang, did something that was supposed to be
 impossible. There was a celebrated quantum algorithm for recommendation
@@ -42,15 +43,25 @@ way.
 So the uncomfortable question is real. When someone shows you a quantum speedup,
 how do you know it is genuine---that no clever student will dequantize it next
 year---versus a speedup that was \emph{redundant all along}, classical advantage
-wearing a quantum costume? It turns out there is a single number you can measure,
-matrix-free, that tells you which side of the line you are on.
+wearing a quantum costume? There is a single number you can measure, matrix-free,
+that---in every case we have tested---separates the speedups with a known classical
+attack from those that resist one. Not a proof; a diagnostic that has been right
+wherever we have checked it.
 
-\section*{The idea}
+\section*{One number: effective rank}
 
-The number is \textbf{effective rank}---in \texttt{resona}, \Phione. The shorthand:
-\emph{quantum advantage needs structure a classical machine cannot cheaply
-simulate.} And the most common ``structure'' in quantum ML---low rank---is exactly
-the structure classical sampling harvests for free.
+First, the one tool this piece leans on. \texttt{resona} is a small open-source
+library for \emph{matrix-free} spectral computation: it answers questions about a
+giant operator---its spectrum, its rank, its structure---using nothing but
+matrix--vector products, never building or storing the matrix itself. That
+restriction is the whole point here, because the operators in question are far too
+big to write down. You hand \texttt{resona} a way to multiply by your operator; it
+hands back the numbers.
+
+The number we want from it is \textbf{effective rank}---in \texttt{resona},
+\Phione. The shorthand: \emph{quantum advantage needs structure a classical machine
+cannot cheaply simulate.} And the most common ``structure'' in quantum ML---low
+rank---is exactly the structure classical sampling harvests for free.
 
 The intuition: if a giant operator secretly lives in a low-dimensional subspace,
 you do not need to touch the whole thing. You can \emph{sample} a few rows or
@@ -64,18 +75,29 @@ directions the operator really uses.
 \[
   \Phi_1 \;=\; \frac{\big(\mathrm{Tr}\,A\big)^2}{\mathrm{Tr}\,A^2}.
 \]
-\textbf{Low \Phione{} $\Rightarrow$ dequantizable.} \textbf{High \Phione{}
-$\Rightarrow$ genuine frontier}, no sampling handle, no shortcut. One dial,
-computed from matrix--vector products, with no matrix ever formed.
+Empirically the reading splits two ways: \textbf{low \Phione{} tracks
+dequantizability}---a few directions carry the action, so sampling reconstructs
+it; \textbf{high \Phione{} tracks the genuine frontier}---no low-rank handle for
+sampling to grab. This is a measured correlation across the cases below, not a
+theorem. A low reading flags a problem as a \emph{candidate} for classical attack;
+a high reading says only that \emph{this probe} found no extractable
+structure---not that none exists. One dial, computed from matrix--vector products,
+with no matrix ever formed.
 
 The reframing is worth pausing on. The usual question---``is this algorithm quantum
 or classical?''---is the wrong one. The right question is ``how much
-\emph{structure} does the problem have?'', and structure is measurable. A quantum
-computer is a machine that pays a fixed price (qubits, coherence, error
-correction) to handle high-structure problems. If the structure is low, you
-overpaid: a classical sampler does the same job for free.
+\emph{structure} does the problem have?'', and structure is measurable.
 
-\section*{The demo: the dequantizable side}
+\begin{quote}
+\textbf{A quantum computer pays a fixed price---qubits, coherence, error
+correction---to deal with problems whose structure cannot be harvested
+classically.}
+\end{quote}
+
+\noindent If the structure is low, you overpaid: a classical sampler does the same
+job for free.
+
+\section*{Where the advantage evaporates}
 
 The stand is \texttt{stands/dequantize.py}. It builds an implicit low-rank operator
 (true rank $r=5$, embedded in up to a million rows) and recovers its top singular
@@ -99,9 +121,14 @@ Phi_1 = resona.effective_rank(A^T A) = 3.28   (true rank r=5)  -- LOW => dequant
 \end{Verbatim}
 
 Low \Phione. The ``exponential quantum advantage'' here was redundant---it was
-paying for low-rank structure that classical sampling extracts for free.
+paying for low-rank structure that classical sampling extracts for free. One
+fair-play note: ``data touched'' counts the sketched rows, and the
+$\lVert\text{row}\rVert^2$ sampling distribution is assumed given---the
+\emph{same} prepared-access assumption the quantum algorithm itself made (its
+QRAM; classically, Tang's data structure maintains those norms as the data is
+written).
 
-\section*{The demo: the genuine wall}
+\section*{Shor: where the wall is real}
 
 Now point the \emph{same dial} at Shor's algorithm---factoring, the speedup that
 actually threatens RSA. The stand is \texttt{stands/shor\_wall.py}. For small order
@@ -117,7 +144,8 @@ on:
 \end{Verbatim}
 
 The Shor sequence reads \textbf{$\Phi_1 = 19.4$}---about \textbf{$10\times$ higher}
-than a simple periodic signal. And the extractability test---does the structure
+than a simple periodic signal: no low-rank handle \emph{that this probe can see}.
+And the extractability test---does the structure
 \emph{saturate} as you widen the window (removable) or keep \emph{growing} (a
 genuine wall)?---is decisive:
 
@@ -128,11 +156,26 @@ genuine wall)?---is decisive:
 \end{Verbatim}
 
 The periodic signal saturates at $2.0$---a finite chart closes, you harvest it
-classically. The Shor target keeps growing ($1.5 \to 40.3$) and never closes:
-\texttt{extractable? False}. The same dial that dequantized the low-rank problem
-here points firmly the other way---\emph{from the same matrix-free measurement}.
+classically. The Shor target keeps growing ($1.5 \to 40.3$) and never closes: the
+structure is \textbf{not extractable}, no finite window will ever contain it. That
+is the stand's own verdict---the \texttt{extractable?\ False} in the table above is
+its printed output. The same dial that flagged the low-rank problem
+``redundant---sample it'' reads ``no extractable structure here'' for
+Shor---\emph{from the same matrix-free measurement}. The first is a green light for
+a classical attack; the second is the \emph{absence of a handle}, which is weaker
+than a proof that no handle exists---but it is exactly where every genuine quantum
+advantage we know of lives.
 
 \section*{The honest limit}
+
+One honest word on what \Phione{} is and isn't. It is not a proof that a speedup is
+impossible---or that one is necessary. It measures a single thing: how much
+low-dimensional structure a problem exposes to matrix-free probes. And the pattern
+is empirical---worth saying plainly. Every dequantization we tested lands in the
+low-\Phione{} regime; every textbook quantum advantage lands at the far end. That
+makes \Phione{} a \emph{diagnostic} you can lean on---a number that has told the two
+apart every time we checked---not a theorem that says they always must. A clean
+track record, and the honesty to say ``so far.''
 
 \Phione{} does not beat \emph{all} quantum computing---and the stand says so plainly.
 It beats exactly the \textbf{low-rank / structured class}: low-rank linear algebra
@@ -145,9 +188,24 @@ polynomial time and breaking RSA, and there is no known path. The framework
 honestly points \emph{away} from that. The dial tells you which fight you are in;
 it does not win the unwinnable one.
 
+\section*{So --- do we need quantum computing?}
+
+Yes---for the problems that earn it. Shor-style period-finding, volume-law
+dynamics, generic random-circuit sampling: there the dial reads high, no
+classical handle exists, and the quantum computer's price buys something real.
+But for a surprising share of what has been sold as ``quantum advantage''---
+everything living in the low-\Phione{} regime---the honest answer is the title
+of this piece. Measure first. If the effective rank is low, you never needed a
+quantum computer at all.
+
 \section*{Run it yourself}
 
+Everything---this article, both stands, and the figures---lives in one repository:
+\url{https://github.com/dimaq12/do-we-need-quantum-computing}.
+
 \begin{Verbatim}[fontsize=\small]
+git clone https://github.com/dimaq12/do-we-need-quantum-computing.git
+cd do-we-need-quantum-computing
 pip install -r requirements.txt
 python stands/dequantize.py
 python stands/shor_wall.py

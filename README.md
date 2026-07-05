@@ -1,8 +1,10 @@
-# Do We Really Need Quantum Computing?
+# Never Quantum at All
+
+![Do we really need quantum computing? One matrix-free dial — the effective rank Φ₁ — tells you which quantum speedups survive a classical attack.](assets/hero.png)
 
 A self-contained essay + runnable demos. The claim — that a matrix-free *dial*
-(the effective rank Φ₁) tells you which "quantum speedups" survive a classical
-attack — is not asserted, it is **run**.
+(the effective rank Φ₁) empirically flags which "quantum speedups" survive a
+classical attack — is not asserted, it is **run**.
 
 Two articles, same question, different angles:
 
@@ -18,7 +20,7 @@ Two articles, same question, different angles:
 ```bash
 pip install -r requirements.txt
 python stands/dequantize.py      # low-rank QML collapses to classical sampling — Φ₁ ≈ 3.3
-python stands/shor_wall.py       # factoring is a genuine wall — Φ₁ grows, no shortcut
+python stands/shor_wall.py       # factoring resists — Φ₁ grows, no extractable handle found
 ```
 
 Both stands are built on [`resona`](https://pypi.org/project/resona/) (matrix-free
